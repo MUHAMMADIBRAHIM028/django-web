@@ -1,35 +1,33 @@
 name: build-and-deploy
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - main
       - staging
 
 env:
-  TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+  TARGET_BRANCH: ${{ github.ref_name }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checking out code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10.12
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r req.txt
 
-      - name: Run migrations and collect static files (optional)
+      - name: Run migrations and collect static files
         run: |
           python manage.py migrate
           python manage.py collectstatic --no-input
@@ -37,16 +35,9 @@ jobs:
   deploy_staging:
     runs-on: ubuntu-latest
     needs: build
-    if: github.event.pull_request.base.ref == 'staging'
+    if: github.ref == 'refs/heads/staging'
 
     steps:
-      - name: Debugging Info
-        run: |
-          echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
-          echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
-          echo "EC2_USERNAME: ${{ secrets.EC2_USERNAME }}"
-          echo "Current Directory: $(pwd)"
-
       - name: Deploy to Staging
         uses: appleboy/ssh-action@master
         with:
@@ -59,4 +50,24 @@ jobs:
             source myenv/bin/activate
             pip install -r req.txt
             python manage.py migrate
-            python manage.py runserver 0.0.0.0:8000 &
+            nohup python manage.py runserver 0.0.0.0:8000 &
+
+  deploy_prod:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Production
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/django-web/djangoweb
+            git pull origin main
+            source myenv/bin/activate
+            pip install -r req.txt
+            python manage.py migrate
+            nohup python manage.py runserver 0.0.0.0:8000 &
