@@ -44,10 +44,25 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+            # Go to project directory
             cd /home/ubuntu/django-web/djangoweb || exit 1
+
+            # Pull latest code from branch
             git pull origin ${{ github.ref_name }}
-            source myenv/bin/activate || python3 -m venv myenv && source myenv/bin/activate
+
+            # Create or activate virtual environment
+            if [ ! -d "myenv" ]; then python3 -m venv myenv; fi
+            source myenv/bin/activate
+
+            # Install requirements
             pip install --upgrade pip
             if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-            python manage.py migrate
-            nohup python manage.py runserver 0.0.0.0:8000 > server.log 2>&1 &
+
+            # Run Django commands
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+
+            # Restart Gunicorn and Nginx
+            sudo systemctl daemon-reload
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx
