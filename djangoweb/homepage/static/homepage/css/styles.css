@@ -1,0 +1,22 @@
+body {
+  background: linear-gradient(120deg,#f6f9fc,#eef2ff);
+}
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 6px 24px rgba(20,20,50,0.06);
+}
+.btn-primary {
+  background: #4f46e5;
+  border: none;
+}
+.btn-primary:hover {
+  background: #3730a3;
+}
+.form-label {
+  font-weight: 600;
+  color: #2b2b2b;
+}
+h2 {
+  font-weight: 700;
+  color: #111827;
+}
