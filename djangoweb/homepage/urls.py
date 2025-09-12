@@ -6,4 +6,7 @@ urlpatterns = [
     path("user/", views.user_info_view, name="user_info"),
     path("success/", views.success_view, name="success"),
     path("index/", views.index, name="index"),
+
+    # --- New Product URL ---
+    path("product/", views.product_view, name="product"),
 ]

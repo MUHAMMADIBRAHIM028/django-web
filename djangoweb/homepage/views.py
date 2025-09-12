@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from .forms import UserInfoForm
-from .models import UserInfo  # Import your model to display records
+from .forms import UserInfoForm, ProductForm  # Added ProductForm
+from .models import UserInfo, Product  # Added Product
 
 # ------------------ Existing index view ------------------
 def index(request):
@@ -22,10 +22,7 @@ def index(request):
 
 # ------------------ User Form Views ------------------
 def user_info_view(request):
-    """
-    Display the user form and handle submission.
-    Includes a link to view all submitted records on the same page.
-    """
+    """Display the user form and handle submission. Includes link to show all records."""
     if request.method == 'POST':
         form = UserInfoForm(request.POST)
         if form.is_valid():
@@ -44,7 +41,19 @@ def user_info_view(request):
     })
 
 def success_view(request):
-    """
-    Simple success page after form submission.
-    """
+    """Simple success page after form submission."""
     return render(request, "homepage/success.html")
+
+
+# ------------------ New Product Form View ------------------
+def product_view(request):
+    """Display the Product form and handle submission."""
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponse("<h2>Product saved successfully!</h2>")
+    else:
+        form = ProductForm()
+
+    return render(request, "homepage/product_form.html", {'form': form})
