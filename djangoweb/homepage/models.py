@@ -14,6 +14,7 @@ class UserInfo(models.Model):
 # ---------------- New Product model ----------------
 class Product(models.Model):
     ROLE_CHOICES = [
+        ('', 'Select'),
         ('Admin', 'Admin'),
         ('User', 'User'),
     ]
