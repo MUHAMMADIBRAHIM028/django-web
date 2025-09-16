@@ -1,10 +1,14 @@
 from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from .forms import UserInfoForm, ProductForm  # Added ProductForm
-from .models import UserInfo, Product  # Added Product
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from .forms import SignupForm, UserInfoForm, ProductForm
+from django.contrib.auth.forms import AuthenticationForm
+from .models import UserInfo, Product
+from django.contrib.auth.decorators import login_required
+from .forms import SignupForm
 
-# ------------------ Existing index view ------------------
 def index(request):
     now = timezone.now()
     html = f"""
@@ -20,7 +24,44 @@ def index(request):
     """
     return HttpResponse(html)
 
-# ------------------ User Form Views ------------------
+# ------------------ SIGNUP VIEW ------------------
+def signup_view(request):
+    form = SignupForm()
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, '✅ Your account has been created successfully!')
+            
+           
+            return redirect('login')  # Redirect to homepage or dashboard
+        elif form.errors:
+            messages.error(request, '❌ Please correct the errors below.')
+        else:
+             form = SignupForm() 
+    return render(request, 'homepage/signup.html', {'form': form})
+
+# ------------------ LOGIN VIEW ------------------
+def login_view(request):
+    form = AuthenticationForm()
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f'✅ Welcome back, {user.first_name}!')
+            return redirect('home')
+        else:
+            messages.error(request, '❌ Invalid email or password.')
+    return render(request, 'homepage/login.html', {'form': form})
+
+# ------------------ LOGOUT VIEW ------------------
+def logout_view(request):
+    logout(request)
+    messages.success(request, '✅ You have been logged out successfully.')
+    return redirect('login')
+
 def user_info_view(request):
     """Display the user form and handle submission. Includes link to show all records."""
     if request.method == 'POST':
@@ -45,7 +86,6 @@ def success_view(request):
     return render(request, "homepage/success.html")
 
 
-# ------------------ New Product Form View ------------------
 def product_view(request):
     """Display the Product form and handle submission."""
     if request.method == 'POST':
@@ -57,3 +97,9 @@ def product_view(request):
         form = ProductForm()
 
     return render(request, "homepage/product_form.html", {'form': form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('login')
