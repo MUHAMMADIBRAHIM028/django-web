@@ -24,6 +24,7 @@ class SignupForm(UserCreationForm):
         max_length=30, required=True, 
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
+    
     first_name = forms.CharField(
         max_length=30, required=True, 
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'})
@@ -35,6 +36,19 @@ class SignupForm(UserCreationForm):
     email = forms.EmailField(
         max_length=254, required=True, 
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+    )   
+    gender = forms.ChoiceField(
+        choices=[
+            ('male', 'Male'),
+            ('female', 'Female'),
+            ('shemale', 'Shemale')
+        ],
+          required=False,
+          widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    birthday = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
     )
 
     password1 = forms.CharField(
@@ -50,7 +64,7 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username','first_name', 'last_name', 'email', 'password1', 'password2')
+        fields = ('username','first_name', 'last_name', 'email', 'gender', 'birthday','password1', 'password2')
 
 
     def __init__(self, *args, **kwargs):

@@ -12,5 +12,5 @@ urlpatterns = [
 
     # --- New Product URL ---
     path("product/", views.product_view, name="product"),
-
+    path('accounts/login/', views.login_view),
 ]

@@ -8,6 +8,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import UserInfo, Product
 from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
+import uuid
+from django.contrib.auth.models import User
+from .models import Profile
+
 
 def index(request):
     now = timezone.now()
@@ -31,30 +35,46 @@ def signup_view(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            #user.username = str(uuid.uuid4())[:30]  # fits Django username length save username
+
+            user.save()
+            gender = form.cleaned_data.get('gender')
+            birthday = form.cleaned_data.get('birthday')
+            Profile.objects.create(user=user, gender=gender, birthday=birthday)
             login(request, user)
+           
             messages.success(request, '✅ Your account has been created successfully!')
             
            
             return redirect('login')  # Redirect to homepage or dashboard
-        elif form.errors:
+        else: 
             messages.error(request, '❌ Please correct the errors below.')
-        else:
+    else:
              form = SignupForm() 
     return render(request, 'homepage/signup.html', {'form': form})
 
 # ------------------ LOGIN VIEW ------------------
 def login_view(request):
-    form = AuthenticationForm()
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            messages.success(request, f'✅ Welcome back, {user.first_name}!')
-            return redirect('home')
-        else:
-            messages.error(request, '❌ Invalid email or password.')
-    return render(request, 'homepage/login.html', {'form': form})
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # get the UUID username from email
+        try:
+            user_obj = User.objects.get(email=email)
+            username = user_obj.username
+        except User.DoesNotExist:
+            username = None
+
+        if username:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('success')  # change 'home' to your homepage URL name
+        messages.error(request, 'Invalid email or password')
+    return render(request, 'homepage/login.html')
+
 
 # ------------------ LOGOUT VIEW ------------------
 def logout_view(request):

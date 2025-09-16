@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+#from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # ---------------- Existing UserInfo model ----------------
 class UserInfo(models.Model):
@@ -33,3 +36,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    #----------------------------signup form-----------------#
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    gender = models.CharField(
+        max_length=10,
+        choices=[('male', 'Male'), ('female', 'Female'), ('shemale', 'Shemale')],
+        null=True,
+        blank=True
+    )
+    birthday = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
