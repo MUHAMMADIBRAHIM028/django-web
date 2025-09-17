@@ -11,22 +11,24 @@ from .forms import SignupForm
 import uuid
 from django.contrib.auth.models import User
 from .models import Profile
+from django.template import engines
 
 
+@login_required
 def index(request):
     now = timezone.now()
-    html = f"""
-    <html>
-        <head><title>Welcome</title></head>
-        <body style="display:flex; justify-content:center; align-items:center; height:100vh; font-size:24px; background:#f4f4f4;">
-            <div>
+    template_string = """
+     {% extends "homepage/base.html" %}
+     {% block title %}Welcome{% endblock %}
+     {% block content %}
+       <div class="container text-center mt-5">
                 <h1>Hello! I am Rodu Sultan Jhang 🌍</h1>
-                <p>Current time and date: <b>{now.strftime('%Y-%m-%d %H:%M:%S')}</b></p>
+                <p>Current time and date: <b>{{ now|date:"Y-m-d H:i:s" }}</b></p>
             </div>
-        </body>
-    </html>
+            {% endblock %}
     """
-    return HttpResponse(html)
+    template = engines['django'].from_string(template_string)
+    return HttpResponse(template.render({'now': now}, request))
 
 # ------------------ SIGNUP VIEW ------------------
 def signup_view(request):
@@ -71,17 +73,22 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('success')  # change 'home' to your homepage URL name
+                return redirect('index')  # change 'home' to your homepage URL name
         messages.error(request, 'Invalid email or password')
     return render(request, 'homepage/login.html')
 
 
+
+
+
 # ------------------ LOGOUT VIEW ------------------
+@login_required
 def logout_view(request):
     logout(request)
     messages.success(request, '✅ You have been logged out successfully.')
     return redirect('login')
 
+@login_required
 def user_info_view(request):
     """Display the user form and handle submission. Includes link to show all records."""
     if request.method == 'POST':
@@ -100,12 +107,12 @@ def user_info_view(request):
         'form': form,
         'users': users
     })
-
+@login_required
 def success_view(request):
     """Simple success page after form submission."""
     return render(request, "homepage/success.html")
 
-
+@login_required
 def product_view(request):
     """Display the Product form and handle submission."""
     if request.method == 'POST':
