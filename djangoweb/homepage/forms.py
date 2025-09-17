@@ -70,6 +70,7 @@ class SignupForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
         # Apply bootstrap styling
-        for fieldname in ['password1', 'password2']:
-            self.fields[fieldname].widget.attrs.update({'class': 'form-control', 'placeholder': fieldname.replace('password', 'Password')})
-            self.fields[fieldname].help_text = ''
+        #for fieldname in ['password1', 'password2']:
+         #   self.fields[fieldname].widget.attrs.update({'class': 'form-control', 'placeholder': fieldname.replace('password', 'Password')})
+          #  self.fields[fieldname].help_text = ''
+            

@@ -55,7 +55,7 @@ ROOT_URLCONF = 'webpage.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,7 +79,7 @@ DATABASES = {
         'NAME': 'myprojectdb',           # Database name you created
         'USER': 'myprojectuser',         # User you created
         'PASSWORD': 'mypassword',        # Password for the user
-         'HOST': 'localhost',        # EC2 public IP or private if same server
+         'HOST': '56.228.24.7',        # EC2 public IP or private if same server
         'PORT': '5432', 
     }
 }
@@ -125,3 +125,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
