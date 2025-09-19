@@ -13,4 +13,8 @@ urlpatterns = [
     # --- New Product URL ---
     path("product/", views.product_view, name="product"),
     path('accounts/login/', views.login_view),
+    path('manage-products/', views.manage_products, name='manage_products'),
+    path('products/create/', views.product_create, name='product_create'),
+    path('products/<int:pk>/edit/', views.product_update, name='product_update'),
+    path('products/<int:pk>/delete/', views.product_delete, name='product_delete'),
 ]

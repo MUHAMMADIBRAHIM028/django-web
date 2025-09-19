@@ -14,9 +14,10 @@ class UserInfoForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['user_role', 'name', 'sku_id', 'description', 'price', 'discount']
+        fields = ['user_role', 'name', 'sku_id', 'description', 'price', 'discount','product_type']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
+         
         }
 
 class SignupForm(UserCreationForm):
