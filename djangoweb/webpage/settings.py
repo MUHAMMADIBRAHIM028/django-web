@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'homepage'
+     'homepage',
+     'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ DATABASES = {
         'NAME': 'myprojectdb',           # Database name you created
         'USER': 'myprojectuser',         # User you created
         'PASSWORD': 'mypassword',        # Password for the user
-         'HOST': 'localhost',        # EC2 public IP or private if same server
+         'HOST': '56.228.24.7',        # EC2 public IP or private if same server
         'PORT': '5432', 
     }
 }

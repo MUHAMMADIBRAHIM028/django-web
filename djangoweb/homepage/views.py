@@ -13,6 +13,9 @@ from django.contrib.auth.models import User
 from .models import Profile
 from django.template import engines
 from django.shortcuts import get_object_or_404
+from .forms import RestaurantForm
+from .models import Restaurant
+
 
 
 @login_required
@@ -185,3 +188,45 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
     return redirect('login')
+
+#-----------Restaurant------------#
+@login_required
+def manage_restaurants(request):
+    """List all restaurants."""
+    restaurants = Restaurant.objects.all().order_by('id')
+    return render(request, 'homepage/manage_restaurants.html', {'restaurants': restaurants})
+
+@login_required
+def restaurant_create(request):
+    """Create a new restaurant."""
+    if request.method == 'POST':
+        form = RestaurantForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ Restaurant has been saved successfully!')
+            return redirect('manage_restaurants')
+    else:
+        form = RestaurantForm()
+    return render(request, 'homepage/restaurant_form.html', {'form': form, 'title': 'Create Restaurant'})
+
+@login_required
+def restaurant_update(request, pk):
+    """Edit an existing restaurant."""
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    if request.method == 'POST':
+        form = RestaurantForm(request.POST, instance=restaurant)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ Restaurant has been updated successfully!')
+            return redirect('manage_restaurants')
+    else:
+        form = RestaurantForm(instance=restaurant)
+    return render(request, 'homepage/restaurant_form.html', {'form': form, 'title': 'Edit Restaurant'})
+
+@login_required
+def restaurant_delete(request, pk):
+    """Delete a restaurant."""
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    restaurant.delete()
+    messages.success(request, '✅ Restaurant deleted successfully!')
+    return redirect('manage_restaurants')

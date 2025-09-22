@@ -3,6 +3,7 @@ from django import forms
 from .models import UserInfo, Product
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from .models import Restaurant
 
 
 class UserInfoForm(forms.ModelForm):
@@ -75,3 +76,14 @@ class SignupForm(UserCreationForm):
          #   self.fields[fieldname].widget.attrs.update({'class': 'form-control', 'placeholder': fieldname.replace('password', 'Password')})
           #  self.fields[fieldname].help_text = ''
             
+
+        #------------Restaurants-----------------#
+class RestaurantForm(forms.ModelForm):
+     class Meta:
+        model = Restaurant
+        fields = ['name', 'description', 'location']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'id': 'location'}),
+        }

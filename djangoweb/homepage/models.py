@@ -62,4 +62,15 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-        
+    
+
+      #------------Restaurant-----------------------------#  
+
+class Restaurant(models.Model):
+     name = models.CharField(max_length=255)
+     description = models.TextField()
+     location = models.CharField(max_length=255)  # or use coordinates if needed
+     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+     def __str__(self):
+      return self.name
