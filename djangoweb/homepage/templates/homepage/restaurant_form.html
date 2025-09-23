@@ -1,47 +1,66 @@
 {% extends "homepage/base.html" %}
-{% block title %}{{ title|default:"Add / Update Restaurant" }}{% endblock %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-  <div class="card shadow-lg p-4" style="max-width: 700px; width: 100%;">
-    <h2 class="text-center mb-4">{{ title|default:"Add / Update Restaurant" }}</h2>
+<div class="container mt-4 d-flex justify-content-center">
+  <!-- limit width to ~A4 portrait -->
+  <div class="card shadow p-4" style="max-width: 700px; width:100%; min-height: 900px;">
+    <h3 class="text-center mb-4">{{ title }}</h3>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post">
       {% csrf_token %}
+      <div class="row">
+        <!-- Left column -->
+        <div class="col-md-6">
+          <div class="mb-2">
+            <label class="form-label">Restaurant Name</label>
+            <input type="text" name="name" class="form-control form-control-sm"
+                   value="{{ form.name.value|default_if_none:'' }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control form-control-sm" rows="3">{{ form.description.value|default_if_none:'' }}</textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Location</label>
+            <input type="text" name="location" id="id_location"
+                   class="form-control form-control-sm"
+                   value="{{ form.location.value|default_if_none:'' }}">
+          </div>
+        </div>
 
-      <!-- Restaurant Name -->
-      <div class="mb-3">
-        <label for="id_name" class="form-label">Restaurant Name</label>
-        <input type="text" name="name" id="id_name" class="form-control"
-               value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter Restaurant Name">
+        <!-- Right column (Menus) -->
+        <div class="col-md-6">
+          <label class="form-label">Menus</label>
+          <div id="menu-fields">
+            <input type="text" name="menus" class="form-control form-control-sm mb-2"
+                   placeholder="Menu item">
+          </div>
+          <button type="button" class="btn btn-outline-primary btn-sm" id="add-menu">+ Add Menu</button>
+        </div>
       </div>
 
-      <!-- Description -->
-      <div class="mb-3">
-        <label for="id_description" class="form-label">Description</label>
-        <textarea name="description" id="id_description" rows="3" class="form-control"
-                  placeholder="Enter description">{{ form.description.value|default_if_none:'' }}</textarea>
+         <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        <a href="{% url 'manage_restaurants' %}" class="btn btn-secondary btn-sm">Back</a>
       </div>
+    </form> <!-- form ends immediately after buttons -->
 
-      <!-- Location Input -->
-      <div class="mb-3">
-        <label for="id_location" class="form-label">Location</label>
-        <input type="text" id="id_location" name="location" class="form-control"
-               value="{{ form.location.value|default_if_none:'' }}" placeholder="Search or enter location">
-      </div>
+  </div> <!-- end card -->
+</div> <!-- end container -->
 
-      <!-- Map -->
-      <div id="map" style="height: 300px; border-radius: 8px;"></div>
-
-      <!-- Submit Buttons -->
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary px-4">Save</button>
-        <a href="{% url 'manage_restaurants' %}" class="btn btn-secondary px-4">Back</a>
-      </div>
-    </form>
-  </div>
-</div>
-
+<!-- JS for dynamic menu fields -->
+<script>
+document.getElementById('add-menu').addEventListener('click', function () {
+  const container = document.getElementById('menu-fields');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.name = 'menus';
+  input.className = 'form-control form-control-sm mb-2';
+  input.placeholder = 'Menu item';
+  container.appendChild(input);
+});
+</script>
 <script>
 function initMap() {
   // Try to parse initial location from input, else use default (Lahore)
@@ -54,42 +73,42 @@ function initMap() {
     : {lat: 31.582045, lng: 74.329376};
 
   // Map
-  const map = new google.maps.Map(document.getElementById("map"), {
-    center: defaultLocation,
-    zoom: 12,
-  });
+  //const map = new google.maps.Map(document.getElementById("map"), {
+   // center: defaultLocation,
+   // zoom: 12,
+  //});
 
   // Marker
-  let marker = new google.maps.Marker({
-    position: defaultLocation,
-    map: map,
-    draggable: true,
-  });
+  //let marker = new google.maps.Marker({
+    //position: defaultLocation,
+    //map: map,
+   // draggable: true,
+  //});
 
   // Places Autocomplete
   const autocomplete = new google.maps.places.Autocomplete(locationInput);
-  autocomplete.bindTo("bounds", map);
+  //autocomplete.bindTo("bounds", map);
 
   autocomplete.addListener("place_changed", function () {
     const place = autocomplete.getPlace();
     if (!place.geometry) return;
-    map.setCenter(place.geometry.location);
-    map.setZoom(15);
-    marker.setPosition(place.geometry.location);
+   // map.setCenter(place.geometry.location);
+   // map.setZoom(15);
+   // marker.setPosition(place.geometry.location);
   });
 
   // Update input when marker dragged
-  marker.addListener("dragend", function () {
-    locationInput.value =
-      marker.getPosition().lat() + "," + marker.getPosition().lng();
-  });
+ // marker.addListener("dragend", function () {
+   // locationInput.value =
+   //   marker.getPosition().lat() + "," + marker.getPosition().lng();
+  //});
 
   // Update marker when map clicked
-  map.addListener("click", function (event) {
-    marker.setPosition(event.latLng);
-    locationInput.value =
-      event.latLng.lat() + "," + event.latLng.lng();
-  });
+ // map.addListener("click", function (event) {
+  //  marker.setPosition(event.latLng);
+  //  locationInput.value =
+   //   event.latLng.lat() + "," + event.latLng.lng();
+ // });
 }
 </script>
 

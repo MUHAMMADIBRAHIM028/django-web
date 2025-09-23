@@ -200,28 +200,59 @@ def manage_restaurants(request):
 def restaurant_create(request):
     """Create a new restaurant."""
     if request.method == 'POST':
-        form = RestaurantForm(request.POST)
+        # Always make a mutable copy
+        post_data = request.POST.copy()
+
+        # Collect all menus fields safely
+        menus_values = post_data.getlist('menus')  # even if only 1 field exists
+        menus_string = ",".join([m.strip() for m in menus_values if m.strip()])
+
+        # Override the single menus field
+        post_data['menus'] = menus_string
+
+        form = RestaurantForm(post_data)
         if form.is_valid():
             form.save()
             messages.success(request, '✅ Restaurant has been saved successfully!')
             return redirect('manage_restaurants')
     else:
         form = RestaurantForm()
-    return render(request, 'homepage/restaurant_form.html', {'form': form, 'title': 'Create Restaurant'})
+
+    return render(
+        request,
+        'homepage/restaurant_form.html',
+        {'form': form, 'title': 'Create Restaurant'}
+    )
 
 @login_required
 def restaurant_update(request, pk):
     """Edit an existing restaurant."""
     restaurant = get_object_or_404(Restaurant, pk=pk)
+
     if request.method == 'POST':
-        form = RestaurantForm(request.POST, instance=restaurant)
+        post_data = request.POST.copy()
+
+        menus_values = post_data.getlist('menus')
+        menus_string = ",".join([m.strip() for m in menus_values if m.strip()])
+
+        post_data['menus'] = menus_string
+
+        form = RestaurantForm(post_data, instance=restaurant)
         if form.is_valid():
             form.save()
             messages.success(request, '✅ Restaurant has been updated successfully!')
             return redirect('manage_restaurants')
     else:
         form = RestaurantForm(instance=restaurant)
-    return render(request, 'homepage/restaurant_form.html', {'form': form, 'title': 'Edit Restaurant'})
+
+    return render(
+        request,
+        'homepage/restaurant_form.html',
+        {'form': form, 'title': 'Edit Restaurant'}
+    )
+
+
+
 
 @login_required
 def restaurant_delete(request, pk):

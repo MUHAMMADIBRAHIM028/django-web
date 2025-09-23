@@ -81,7 +81,7 @@ class SignupForm(UserCreationForm):
 class RestaurantForm(forms.ModelForm):
      class Meta:
         model = Restaurant
-        fields = ['name', 'description', 'location']
+        fields = ['name', 'description', 'location', 'menus']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
