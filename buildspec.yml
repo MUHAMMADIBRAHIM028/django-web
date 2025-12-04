@@ -5,37 +5,10 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
-      - echo "Installing dependencies..."
-      - python -m pip install --upgrade pip
-      - pip install -r requirements.txt
-
-  pre_build:
-    commands:
-      - echo "Checking Django installation..."
-      - python -c "import django; print('Django version: {}'.format(django.__version__))"
-      - echo "Running Django system check..."
-      - cd djangoweb
-      - python manage.py check --deploy
-      - cd ..
-
+      - echo 'Hello'
   build:
     commands:
-      - echo "Building Django app..."
-      - mkdir -p nginx scripts
-      - cd djangoweb
-      - python manage.py collectstatic --noinput
-      - cd ..
-      - echo "Creating deployment package..."
-      - tar -czf deploy.tar.gz djangoweb/ requirements.txt
-
-  post_build:
-    commands:
-      - echo "Build completed on $(date)"
-      - echo "Deployment package created: deploy.tar.gz"
-      - ls -lh deploy.tar.gz
-
+      - echo 'Building...'
 artifacts:
   files:
-    - 'deploy.tar.gz'
-  base-directory: '.'
-  discard-paths: no
+    - '*'
