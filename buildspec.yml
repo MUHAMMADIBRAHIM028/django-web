@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.9  # Specify Python 3.9 instead of default
+      python: 3.9
     commands:
       - echo "Installing dependencies..."
       - python -m pip install --upgrade pip
@@ -12,7 +12,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking Django installation..."
-      - python -c "import django; print(f'Django version: {django.__version__}')"
+      - python -c "import django; print('Django version: {}'.format(django.__version__))"
       - echo "Running Django system check..."
       - cd djangoweb
       - python manage.py check --deploy
@@ -21,20 +21,16 @@ phases:
   build:
     commands:
       - echo "Building Django app..."
-      # Create missing directories if they don't exist
       - mkdir -p nginx scripts
       - cd djangoweb
       - python manage.py collectstatic --noinput
       - cd ..
       - echo "Creating deployment package..."
-      # Only include what actually exists
       - tar -czf deploy.tar.gz djangoweb/ requirements.txt
-      # If you have nginx and scripts directories, add them:
-      # - tar -czf deploy.tar.gz djangoweb/ nginx/ scripts/ requirements.txt
 
   post_build:
     commands:
-      - echo "Build completed at `date`"
+      - echo "Build completed on $(date)"
       - echo "Deployment package created: deploy.tar.gz"
       - ls -lh deploy.tar.gz
 
