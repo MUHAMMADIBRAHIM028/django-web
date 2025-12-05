@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'myprojectdb',           # Database name you created
         'USER': 'myprojectuser',         # User you created
         'PASSWORD': 'mypassword',        # Password for the user
-         'HOST': '127.0.0.1',        # EC2 public IP or private if same server
+         'HOST': '127.0.0.1',        
         'PORT': '5432', 
     }
 }
@@ -132,4 +132,4 @@ LOGIN_URL = 'login'          # @login_required sends here if not logged in
 LOGIN_REDIRECT_URL = 'index' # after login go to home
 LOGOUT_REDIRECT_URL = 'login'
 
-
+#update the settings files
