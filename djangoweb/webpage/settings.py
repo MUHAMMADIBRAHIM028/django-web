@@ -134,3 +134,4 @@ LOGOUT_REDIRECT_URL = 'login'
 
 #update the settings files
 #helo world
+#this is for test line
