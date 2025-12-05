@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'myprojectdb',           # Database name you created
         'USER': 'myprojectuser',         # User you created
         'PASSWORD': 'mypassword',        # Password for the user
-         'HOST': 'localhost',        # EC2 public IP or private if same server
+         'HOST': '127.0.0.1',        # EC2 public IP or private if same server
         'PORT': '5432', 
     }
 }

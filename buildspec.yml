@@ -6,13 +6,12 @@ phases:
       python: 3.9
     commands:
       - echo "Setting up SSH..."
+      - mkdir -p ~/.ssh
 
   build:
     commands:
       - echo "Creating SSH key..."
       - |
-        # Create SSH key using here document (preserves formatting)
-        mkdir -p ~/.ssh
         cat > ~/.ssh/key.pem << 'SSHKEY'
         -----BEGIN OPENSSH PRIVATE KEY-----
         b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
@@ -43,21 +42,28 @@ phases:
         ECAwQFBg==
         -----END OPENSSH PRIVATE KEY-----
         SSHKEY
-        
-        chmod 600 ~/.ssh/key.pem
-        
-        # Test connection
-        ssh-keyscan -H 3.239.115.151 >> ~/.ssh/known_hosts 2>/dev/null
-        
-        echo "Testing SSH connection..."
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem ec2-user@3.239.115.151 "echo 'SSH connection successful!'" || echo "SSH test failed, continuing..."
-        
-        echo "Copying files..."
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/key.pem -r djangoweb/* ec2-user@3.239.115.151:/home/ec2-user/djangoweb/ 2>/dev/null || echo "SCP failed, continuing..."
-        
-        echo "Restarting services..."
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem ec2-user@3.239.115.151 "sudo systemctl restart gunicorn 2>/dev/null && echo 'Services restarted!'" || echo "SSH command failed"
+
+      - chmod 600 ~/.ssh/key.pem
+      - ssh-keyscan -H 3.239.115.151 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - echo "Testing SSH connection..."
+      - ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem ec2-user@3.239.115.151 "echo 'SSH OK'"
+
+      - echo "Uploading project files..."
+      - scp -o StrictHostKeyChecking=no -i ~/.ssh/key.pem -r djangoweb/* ec2-user@3.239.115.151:/home/ec2-user/djangoweb/
+
+      - echo "Running migrations on EC2..."
+      - |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem ec2-user@3.239.115.151 "
+          cd /home/ec2-user/djangoweb &&
+          source venv/bin/activate &&
+          python manage.py migrate --noinput &&
+          python manage.py collectstatic --noinput &&
+          sudo systemctl restart gunicorn &&
+          sudo systemctl restart nginx &&
+          echo 'Deploy complete!'
+        "
 
 artifacts:
   files:
-    - '**/*'
+    - "**/*"
