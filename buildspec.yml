@@ -5,10 +5,53 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
-      - echo 'Hello'
+      - echo "Minimal setup..."
+
   build:
     commands:
-      - echo 'Building...'
+      - echo "Copying files to EC2..."
+      - |
+        # Create SSH key file
+        mkdir -p ~/.ssh
+        echo '-----BEGIN OPENSSH PRIVATE KEY-----'
+        echo 'b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn'
+        echo 'NhAAAAAwEAAQAAAQEAn/ruIxqEb9s4GJ7GGp3aTmdiVHvRzFwXvcy8+BGCMtiGe5GnjLQm'
+        echo 'zyqiLPrFku9VR02fpJK8tq9NpyC1zcal9RjuFVyZMCmxskmwmcAbT/w7MPd6VCxLh8iGnj'
+        echo 'Tb4BDDaZpiv+LdJuNNlExzEZVzv12o9pWFnK3LqvVT03BoXecwMPzWldWSSZ2eTP+Z87bH'
+        echo 'Om8qKvT2ougO1lf4Tb3tBv2Cg62v4a/LdruOJWbY0aVzFxz5b45BYyr9RK9/xlIZFMyZHV'
+        echo 'X5DD6qra9MH41JWqc6zuDNlkcZ3skLtVfZmHE3GAhwNc16g1LSQclqLm8RmiTkSGnX/Y0t'
+        echo 'PAPzLwIEOQAAA+A4LuzoOC7s6AAAAAdzc2gtcnNhAAABAQCf+u4jGoRv2zgYnsYandpOZ2'
+        echo 'JUe9HMXBe9zLz4EYIy2IZ7kaeMtCbPKqIs+sWS71VHTZ+kkry2r02nILXNxqX1GO4VXJkw'
+        echo 'KbGySbCZwBtP/Dsw93pULEuHyIaeNNvgEMNpmmK/4t0m402UTHMRlXO/Xaj2lYWcrcuq9V'
+        echo 'PTcGhd5zAw/NaV1ZJJnZ5M/5nztsc6byoq9Pai6A7WV/hNve0G/YKDra/hr8t2u44lZtjR'
+        echo 'pXMXHPlvjkFjKv1Er3/GUhkUzJkdVfkMPqqtr0wfjUlapzrO4M2WRxneyQu1V9mYcTcYCH'
+        echo 'A1zXqDUtJByWoubxGaJORIadf9jS08A/MvAgQ5AAAAAwEAAQAAAQAAj7riOKeaVOSfgX8k'
+        echo 'fMVVXRuFPGICG5ihu+Q14qnYT9Y4/MvfvIoeVAH5sm+bEmf0NhuHUlSDN55IJd89d6MBdz'
+        echo 'LutEJ9XsgW3hdWkswFvdbfVx8AyJ8DPPrr9zeGU8i7yCTsk3k/N7EAAjytJR8g3s1HAENV'
+        echo 'x25djTrcFRroqXOe9GNP3TCTj0EanoveAXN10W9Q/QeJGzoEnZruK2BEXqkHnVMgNd8cji'
+        echo 'GPxDC2XmQZVB7msOpFRPwGdnRIjfWyT32+U2jbDqTWikgjTyhdZEazFiXrg89yQr9gapk+'
+        echo '3D7U7aWoIlOIRLfaGcRGCGqSwVQYZZ0c1SW/nNGRDus5AAAAgH6YWwbBjs9qUOLVJWOklz'
+        echo 'O4WQePYn/m9zgOTNip9kKnrUd8pmNJBbQM+8wDROwAUpti+y06uRVygDCAvQm12wBqaevz'
+        echo 'IPr3DxBNAJcncA4O0IJCWyzhDVca1DWVhJCVZhLH1lzDJhwQjHlBcpaToIGCUAL+wbvkWE'
+        echo 'fKEIqWJjpEAAAAgQDb3zqjY6svyFo7beaejPsldLdoJsTqf7MrVriJTFbBq5sPvXf7YfI9'
+        echo 'PkEIr7Q+4HEozdsE4I2zOZ65gdTca5ggq8Lk9zP71Qs9pFxseInw949FvXFQMxUhkfhTC4'
+        echo 'ygoRJ3Ac3jiYp1kSe/akmMPgRrATuTuj3/ttAGnxmW8i0ZtwAAAIEAukRkaFdzWv4czd1C'
+        echo 'vHTZKmCMMxNiqgnfC75fYeZZU7wvOJcRQ3xnfim9LIfIVE+yqBgKDCRawSgmplMEGnC3dv'
+        echo '8XAAoi5m9o9/ZEwysi35EgwpPUxP9SSpYPdJXJX2l3lHwYgck4Qp1MVLaIWtK1qb7dPNOA'
+        echo '+2WdVr2s8YXAkY8AAAAlZWMyLXVzZXJAaXAtMTcyLTMxLTY0LTQ3LmVjMi5pbnRlcm5hbA'
+        echo 'ECAwQFBg=='
+        echo '-----END OPENSSH PRIVATE KEY-----' > ~/.ssh/key.pem
+        chmod 600 ~/.ssh/key.pem
+        
+        # Test connection
+        ssh-keyscan -H 3.239.115.151 >> ~/.ssh/known_hosts
+        
+        # Just copy files (minimal)
+        scp -r -i ~/.ssh/key.pem djangoweb/* ec2-user@3.239.115.151:/home/ec2-user/djangoweb/
+        
+        # Restart services
+        ssh -i ~/.ssh/key.pem ec2-user@3.239.115.151 "sudo systemctl restart gunicorn && echo 'Deployed!'"
+
 artifacts:
   files:
-    - '*'
+    - '**/*'
