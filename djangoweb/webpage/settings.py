@@ -133,3 +133,4 @@ LOGIN_REDIRECT_URL = 'index' # after login go to home
 LOGOUT_REDIRECT_URL = 'login'
 
 #update the settings files
+#helo world
